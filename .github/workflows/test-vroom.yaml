@@ -1,0 +1,61 @@
+# Workflow derived from https://github.com/r-lib/actions/tree/master/examples
+# Need help debugging build failures? Start at https://github.com/r-lib/actions#where-to-find-help
+on:
+  push:
+    branches: [main, master]
+
+name: Test Vroom
+
+jobs:
+  R-CMD-check:
+    runs-on: ${{ matrix.config.os }}
+    name: ${{ matrix.config.os }} (${{ matrix.config.r }})
+    strategy:
+      fail-fast: false
+      matrix:
+        config:
+          - {os: macOS-latest,   r: 'release'}
+          - {os: windows-latest, r: 'release'}
+          - {os: ubuntu-latest,   r: 'devel', http-user-agent: 'release'}
+          - {os: ubuntu-latest,   r: 'release'}
+          - {os: ubuntu-latest,   r: 'oldrel-1'}
+
+    env:
+      GITHUB_PAT: ${{ secrets.GITHUB_TOKEN }}
+      R_KEEP_PKG_SOURCE: yes
+
+    steps:
+      - uses: actions/checkout@v2
+
+      - uses: r-lib/actions/setup-r@v1
+        with:
+          r-version: ${{ matrix.config.r }}
+          http-user-agent: ${{ matrix.config.http-user-agent }}
+          use-public-rspm: true
+
+      - name: Install packages
+        run: |
+          install.packages(c("vroom", "tibble", "withr"))
+          data <- tibble::tribble(
+            ~X1,                ~X2,                ~X3,
+            "Gene ID",    "PF3D7_0106300",    "PF3D7_0523000",
+            "Gene",             "atp6",             "mdr1",
+            "Mutation Name",   "atp6-Ala623Glu",    "mdr1-Asn86Tyr",
+            "ExonicFunc", "missense_variant", "missense_variant",
+            "AA Change",        "Ala623Glu",         "Asn86Tyr",
+            "Targeted",              "Yes",              "Yes",
+            "D10-JJJ-23",                "0",               "13",
+            "D10-JJJ-43",                "0",                "0"
+          )
+
+          local_file <- withr::local_tempfile(fileext = ".csv")
+          vroom::vroom_write(data, local_file)
+
+          vroom::vroom(
+            file = local_file,
+            col_names = FALSE,
+            show_col_types = FALSE
+          )
+        shell: Rscript {0}
+
+
