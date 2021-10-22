@@ -33,7 +33,7 @@ jobs:
           http-user-agent: ${{ matrix.config.http-user-agent }}
           use-public-rspm: true
 
-      - name: Install packages
+      - name: Run reprex
         run: |
           install.packages(c("vroom", "tibble", "withr"))
           data <- tibble::tribble(
@@ -54,6 +54,7 @@ jobs:
           vroom::vroom(
             file = local_file,
             col_names = FALSE,
+            col_select = c(1, 2),
             show_col_types = FALSE
           )
         shell: Rscript {0}
