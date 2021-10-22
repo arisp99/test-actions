@@ -45,13 +45,14 @@ jobs:
             "D10-JJJ-23",                "0",               "13",
             "D10-JJJ-43",                "0",                "0"
           )
-
-          local_file <- withr::local_tempfile(fileext = ".csv")
-          vroom::vroom_write(data, local_file)
         shell: Rscript {0}
 
       - name : Check col_names
+        if: always()
         run: |
+          local_file <- withr::local_tempfile(fileext = ".csv")
+          vroom::vroom_write(data, local_file)
+
           vroom::vroom(
             file = local_file,
             col_names = FALSE,
@@ -60,7 +61,11 @@ jobs:
         shell: Rscript {0}
 
       - name : Check col_select
+        if: always()
         run: |
+          local_file <- withr::local_tempfile(fileext = ".csv")
+          vroom::vroom_write(data, local_file)
+
           vroom::vroom(
             file = local_file,
             col_select = c(1, 2),
@@ -69,7 +74,11 @@ jobs:
         shell: Rscript {0}
 
       - name : Check both col_names and col_select
+        if: always()
         run: |
+          local_file <- withr::local_tempfile(fileext = ".csv")
+          vroom::vroom_write(data, local_file)
+
           vroom::vroom(
             file = local_file,
             col_names = FALSE,
