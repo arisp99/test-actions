@@ -23,6 +23,7 @@ jobs:
         fetch-depth: 0
 
     - name: Prettify code
-      uses: actionsx/prettier@v2
+      uses: arisp99/prettier_action@v4.1.1
       with:
-        args: --write **/*.md
+        prettier_options: --write **/*.md
+        commit_message: "Style markdown"
